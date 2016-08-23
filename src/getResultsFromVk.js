@@ -77,9 +77,4 @@ export default (
       }))
     )
     .value()
-  ))
-  .then((results) => Promise.resolve(_(results)
-    .sortBy('bitrate', 'score')
-    .reverse()
-    .head()
   ));

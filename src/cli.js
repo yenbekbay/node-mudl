@@ -6,22 +6,24 @@
 
 import fs from 'fs';
 
+import _ from 'lodash';
 import chalk from 'chalk';
 import Configstore from 'configstore';
+import inquirer from 'inquirer';
 import ora from 'ora';
 import pathExists from 'path-exists';
 import updateNotifier from 'update-notifier';
 import yargs from 'yargs';
 
-import { formatDuration } from './helpers';
+import { formatDuration, metaForResult } from './helpers';
 import authenticate from './authenticate';
 import downloadTrack from './downloadTrack';
 import getMatch from './getMatch';
-import getResultFromVk from './getResultFromVk';
+import getResultsFromVk from './getResultsFromVk';
 import parseQuery from './parseQuery';
 import pkg from '../package';
 import type { Match } from './getMatch';
-import type { Result } from './getResultFromVk';
+import type { Result } from './getResultsFromVk';
 
 const config = new Configstore(pkg.name);
 
@@ -81,10 +83,35 @@ if (!query) {
           spinner.text = 'Gettings results from VK...';
           spinner.start();
 
-          return getResultFromVk({ accessToken, userId }, query, match)
-            .then((result: ?Result) => {
+          return getResultsFromVk({ accessToken, userId }, query, match)
+            .then((results: Array<Result>): Promise<?Result> => {
               spinner.stop();
 
+              if (!results.length) return Promise.resolve();
+
+              const bestResult = _(results)
+                .sortBy('bitrate', 'score')
+                .reverse()
+                .head();
+
+              if (bestResult.bitrate === 320) {
+                return Promise.resolve(bestResult);
+              }
+
+              return inquirer
+                .prompt([{
+                  name: 'result',
+                  message: 'Please select the best result',
+                  choices: results.map((result) => ({
+                    name: `${result.artist} - ${result.title} ` +
+                      `(${metaForResult(result)})`,
+                    value: result
+                  })),
+                  type: 'list'
+                }])
+                .then(({ result }) => Promise.resolve(result));
+            })
+            .then((result: ?Result) => {
               const trackInfo = match || result;
 
               if (trackInfo && !trackInfo.version && query.version) {

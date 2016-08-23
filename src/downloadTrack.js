@@ -14,8 +14,8 @@ import pathExists from 'path-exists';
 import progress from 'request-progress';
 import request from 'request-promise';
 
-import { formatDuration, formatSize } from './helpers';
-import type { Result } from './getResultFromVk';
+import { formatDuration, formatSize, metaForResult } from './helpers';
+import type { Result } from './getResultsFromVk';
 
 export default (
   result: Result,
@@ -30,10 +30,7 @@ export default (
     return Promise.reject(new Error(`File named "${fileName}" already exists`));
   }
 
-  const meta = [
-    formatDuration(result.duration),
-    `${result.bitrate}kbps`
-  ].join(', ');
+  const meta = metaForResult(result);
   console.log(chalk.green(`Downloading "${fileName}" (${meta})`));
   gauge.show();
 
