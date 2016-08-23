@@ -79,7 +79,9 @@ export default (
       .setFrame('TALB', _.get(
         trackInfo,
         'album.title',
-        _.nth(trackInfo.title.match(/([^\(]*)/), 1) || ''
+        /\((original|extended|radio).*\)/i.test(trackInfo.title)
+          ? _.nth(trackInfo.title.match(/([^\(]*)/), 1) || ''
+          : trackInfo.title
       ))
       // Set album artist tag
       .setFrame('TPE2', _.get(
