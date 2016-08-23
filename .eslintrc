@@ -1,0 +1,52 @@
+{
+  "parser": "babel-eslint",
+  "extends": "airbnb-base",
+  "env": {
+    "es6": true
+  },
+  "plugins": [
+    "flowtype",
+    "import"
+  ],
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
+  "rules": {
+    "arrow-parens": [1, "always"],
+    "comma-dangle": [1, "never"],
+    "global-require": 0,
+    "max-len": [1, 80],
+    "no-alert": 0,
+    "no-confusing-arrow": [1, { "allowParens": true }],
+    "no-console": 0,
+    "no-duplicate-imports": 0,
+    "no-multiple-empty-lines": [1, { "max": 1 }],
+    "no-underscore-dangle": 0,
+    "no-unused-expressions": [1, { "allowShortCircuit": true }],
+    "quote-props": [1, "consistent-as-needed"],
+
+    "import/newline-after-import": 0,
+    "import/no-duplicates": 1,
+    "import/no-extraneous-dependencies": 0,
+    "import/no-unresolved": 0,
+    "import/order": [1, {
+      "groups": [
+        "builtin",
+        "external",
+        "internal",
+        ["parent", "sibling", "index"]
+      ],
+      "newlines-between": "always"
+    }],
+
+    "flowtype/require-parameter-type": [2, {
+      "excludeArrowFunctions": "expressionsOnly"
+    }],
+    "flowtype/require-return-type": [2, "always", {
+      "excludeArrowFunctions": "expressionsOnly"
+    }],
+    "flowtype/use-flow-type": 1
+  }
+}
