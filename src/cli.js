@@ -18,11 +18,11 @@ import yargs from 'yargs';
 import { formatDuration, metaForResult } from './helpers';
 import authenticate from './authenticate';
 import downloadTrack from './downloadTrack';
-import getMatch from './getMatch';
+import getMatches from './getMatches';
 import getResultsFromVk from './getResultsFromVk';
 import parseQuery from './parseQuery';
 import pkg from '../package';
-import type { Match } from './getMatch';
+import type { Match } from './getMatches';
 import type { Result } from './getResultsFromVk';
 
 const config = new Configstore(pkg.name);
@@ -65,10 +65,32 @@ if (!query) {
     .then(({ accessToken, userId }) => {
       const spinner = ora('Looking for a match...').start();
 
-      return getMatch(query)
-        .then((match: ?Match) => {
+      return getMatches(query)
+        .then((matches: Array<Match>) => {
           spinner.stop();
 
+          if (!matches.length) return Promise.resolve();
+
+          const bestMatch = _.head(matches);
+
+          if (bestMatch.score >= 0.9) {
+            return Promise.resolve(bestMatch);
+          }
+
+          return inquirer
+            .prompt([{
+              name: 'match',
+              message: 'Please select the best match',
+              choices: matches.map((match) => ({
+                name: `${match.artist} - ${match.title} ` +
+                  `(${match.source}, ${formatDuration(match.duration)})`,
+                value: match
+              })),
+              type: 'list'
+            }])
+            .then(({ match }) => match);
+        })
+        .then((match: ?Match) => {
           if (match) {
             const { source, artist, title, duration } = match;
 

@@ -30,12 +30,12 @@ const request = requestPromise.defaults({
   }
 });
 
-export default (query: TrackQuery): Promise<?Match> => {
+export default (query: TrackQuery): Promise<Array<Match>> => {
   const getMatchesFromSoundcloud = () => request
     .get({
       uri: 'http://api.soundcloud.com/tracks',
       qs: {
-        client_id: '2eaab453dce03a7bca4b475e4132a163',
+        client_id: '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea',
         q: `${query.artist} - ${query.title}`
       },
       json: true
@@ -119,7 +119,6 @@ export default (query: TrackQuery): Promise<?Match> => {
       }))
       .sortBy('score', (match) => !!match.coverUrl)
       .reverse()
-      .head()
       .value()
     ));
 };

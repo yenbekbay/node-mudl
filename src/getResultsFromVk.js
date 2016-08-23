@@ -7,7 +7,7 @@ import request from 'request-promise';
 import similarity from 'similarity';
 
 import parseQuery from './parseQuery';
-import type { Match } from './getMatch';
+import type { Match } from './getMatches';
 import type { TrackQuery } from './parseQuery';
 
 const calculateBitrate = (size: number, duration: number) => _
@@ -32,7 +32,7 @@ export default (
   { accessToken, userId }: { accessToken: string, userId: string },
   query: TrackQuery,
   match: ?Match
-): Promise<?Result> => request
+): Promise<Array<Result>> => request
   .get({
     uri: 'https://api.vk.com/method/audio.search',
     qs: {
