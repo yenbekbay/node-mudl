@@ -81,11 +81,14 @@ if (!query) {
             .prompt([{
               name: 'match',
               message: 'Please select the best match',
-              choices: matches.map((match) => ({
-                name: `${match.artist} - ${match.title} ` +
-                  `(${match.source}, ${formatDuration(match.duration)})`,
-                value: match
-              })),
+              choices: [
+                ...matches.map((match) => ({
+                  name: `${match.artist} - ${match.title} ` +
+                    `(${match.source}, ${formatDuration(match.duration)})`,
+                  value: match
+                })),
+                { name: '→ Skip', value: null }
+              ],
               type: 'list'
             }])
             .then(({ match }) => match);
