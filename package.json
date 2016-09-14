@@ -7,6 +7,9 @@
   "bin": {
     "mudl": "./lib/cli.js"
   },
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build": "babel ./src -d ./lib",
     "prepublish": "npm run build"
