@@ -54,12 +54,14 @@
     "babel-plugin-transform-flow-strip-types": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
-    "eslint": "^3.3.1",
-    "eslint-config-airbnb-base": "^5.0.2",
-    "eslint-plugin-flowtype": "^2.6.1",
-    "eslint-plugin-import": "^1.9.2",
-    "flow-typed": "^2.0.0-beta.6",
-    "typings": "^1.3.2"
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb-base": "^7.0.1",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-flowtype": "^2.16.1",
+    "eslint-plugin-import": "^1.15.0",
+    "eslint-plugin-lodash-fp": "^2.0.1",
+    "eslint-plugin-no-use-extend-native": "^0.3.8",
+    "eslint-plugin-promise": "^2.0.1"
   },
   "engines": {
     "node": ">=5.0",

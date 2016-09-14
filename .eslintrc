@@ -1,12 +1,19 @@
 {
   "parser": "babel-eslint",
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base",
+    "plugin:lodash-fp/recommended"
+  ],
   "env": {
     "es6": true
   },
   "plugins": [
+    "babel",
     "flowtype",
-    "import"
+    "import",
+    "lodash-fp",
+    "no-use-extend-native",
+    "promise"
   ],
   "settings": {
     "flowtype": {
@@ -14,23 +21,20 @@
     }
   },
   "rules": {
-    "arrow-parens": [1, "always"],
-    "comma-dangle": [1, "never"],
-    "global-require": 0,
+    "array-bracket-spacing": 0,
+    "arrow-parens": [2, "always"],
+    "generator-star-spacing": 0,
     "max-len": [1, 80],
-    "no-alert": 0,
-    "no-confusing-arrow": [1, { "allowParens": true }],
     "no-console": 0,
     "no-duplicate-imports": 0,
     "no-multiple-empty-lines": [1, { "max": 1 }],
     "no-underscore-dangle": 0,
-    "no-unused-expressions": [1, { "allowShortCircuit": true }],
-    "quote-props": [1, "consistent-as-needed"],
 
-    "import/newline-after-import": 0,
-    "import/no-duplicates": 1,
-    "import/no-extraneous-dependencies": 0,
-    "import/no-unresolved": 0,
+    "babel/array-bracket-spacing": [2, "never"],
+    "babel/flow-object-type": [1, "comma"],
+    "babel/func-params-comma-dangle": [2, "always-multiline"],
+    "babel/generator-star-spacing": [2, { "before": false, "after": true }],
+
     "import/order": [1, {
       "groups": [
         "builtin",
@@ -41,12 +45,16 @@
       "newlines-between": "always"
     }],
 
-    "flowtype/require-parameter-type": [2, {
-      "excludeArrowFunctions": "expressionsOnly"
-    }],
-    "flowtype/require-return-type": [2, "always", {
-      "excludeArrowFunctions": "expressionsOnly"
-    }],
-    "flowtype/use-flow-type": 1
+    "flowtype/require-parameter-type": 1,
+    "flowtype/require-return-type": 1,
+    "flowtype/space-after-type-colon": [2, "always"],
+    "flowtype/space-before-type-colon": [1, "never"],
+    "flowtype/valid-syntax": 1,
+
+    "no-use-extend-native/no-use-extend-native": 0,
+
+    "promise/always-return": 2,
+    "promise/catch-or-return": 2,
+    "promise/param-names": 2
   }
 }
