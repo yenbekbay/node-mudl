@@ -1,6 +1,7 @@
 [ignore]
 
 [libs]
+flow-typed/
 
 [options]
 munge_underscores=true
@@ -13,4 +14,4 @@ suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
 suppress_comment= \\(.\\|\n\\)*\\$FlowIssue
 
 [version]
-^0.31.0
+^0.32.0
