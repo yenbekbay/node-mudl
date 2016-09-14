@@ -12,7 +12,10 @@
   ],
   "scripts": {
     "build": "babel ./src -d ./lib",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./src",
+    "fixlint": "eslint --fix ./src"
   },
   "repository": {
     "type": "git",

@@ -2,7 +2,7 @@
  * @flow
  */
 
-import _ from 'lodash';
+import _ from 'lodash/fp';
 import cheerio from 'cheerio';
 import requestPromise from 'request-promise';
 
@@ -17,7 +17,7 @@ export type AuthResponse = {
 
 const request = requestPromise.defaults({
   jar: true,
-  resolveWithFullResponse: true
+  resolveWithFullResponse: true,
 });
 
 export default (email: string, pass: string): Promise<AuthResponse> => request
@@ -28,18 +28,21 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
       redirect_uri: vkRedirectUri,
       display: 'mobile',
       scope: 'offline,audio',
-      response_type: 'code'
-    }
+      response_type: 'code',
+    },
   })
   .then(({ body }: { body: Object }): Promise<Object> => {
     const $ = cheerio.load(body);
 
     const form = $('form');
     const uri = form.attr('action');
-    const params = form
-      .serializeArray()
-      .map((el) => ({ [el.name]: el.value }))
-      .reduce((param, reducedParams) => ({ ...reducedParams, ...param }));
+    const params = _.flow(
+      _.map(({ name, value }: {
+        name: string,
+        value: mixed,
+      }): Object => ({ [name]: value })),
+      _.assign,
+    )(form.serializeArray());
 
     if (!uri || !params) {
       return Promise.reject('VK authorization failed');
@@ -49,13 +52,13 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
       uri,
       form: {
         ...params,
-        ...{ email, pass }
+        ...{ email, pass },
       },
-      followAllRedirects: true
+      followAllRedirects: true,
     });
   })
   .then(({ request: { uri } }: { request: Object }): Promise<Object> => {
-    const code = _.nth(_.get(uri, 'hash', '').match(/code=(.*)/), 1);
+    const code = _.nth(1)(_.getOr('')('hash')(uri).match(/code=(.*)/));
 
     if (!code) {
       return Promise.reject('VK authorization failed');
@@ -67,9 +70,9 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
         client_id: vkClientId,
         client_secret: vkClientSecret,
         redirect_uri: vkRedirectUri,
-        code
+        code,
       },
-      json: true
+      json: true,
     });
   })
   .then(({ body }: { body: Object }): Promise<AuthResponse> => {
@@ -79,6 +82,6 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
 
     return Promise.resolve({
       accessToken: body.access_token,
-      userId: body.user_id
+      userId: body.user_id,
     });
   });

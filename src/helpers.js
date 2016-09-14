@@ -2,7 +2,7 @@
  * @flow
  */
 
-import _ from 'lodash';
+import _ from 'lodash/fp';
 
 import type { Result } from './getResultsFromVk';
 
@@ -12,9 +12,8 @@ export const formatDuration = (duration: number): string => {
 
   return minutes === 0 ? `${seconds}s` : `${minutes}m${seconds}s`;
 };
-export const formatSize = (size: number) =>
-  `${_.round(size / 1024 / 1024, 2)}MB`;
-export const metaForResult = (result: Result) => [
-  formatDuration(result.duration),
-  `${result.bitrate}kbps`
-].join(', ');
+export const formatSize = (size: number): string =>
+  `${_.round((size / 1024 / 1024) * 100) / 100}MB`;
+export const metaForResult = (result: Result): string => _.join(', ')(
+  [formatDuration(result.duration), `${result.bitrate}kbps`],
+);

@@ -5,7 +5,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import _ from 'lodash';
+import _ from 'lodash/fp';
 import chalk from 'chalk';
 import Gauge from 'gauge';
 import ID3Writer from 'browser-id3-writer';
@@ -20,8 +20,8 @@ import type { Result } from './getResultsFromVk';
 export default (
   result: Result,
   trackInfo: Object,
-  dir: ?string
-): Promise<any> => {
+  dir: ?string,
+): Promise<void> => {
   const gauge = new Gauge();
   const fileName = `${trackInfo.artist} - ${trackInfo.title}.mp3`;
   const filePath = path.join(dir || '', fileName);
@@ -44,11 +44,11 @@ export default (
             transferred: number
           },
           time: { remaining: number }
-        }
+        },
       ) => {
         gauge.show(
           `${formatSize(size.transferred)}/${formatSize(size.total)}`,
-          percentage
+          percentage,
         );
         gauge.pulse(`${formatDuration(time.remaining)} remaining`);
       })
@@ -56,13 +56,15 @@ export default (
       .on('end', resolve)
       .pipe(fs.createWriteStream(filePath));
   })
-  .then(() => (
+  .then((): Promise<?string> => (
     trackInfo.coverUrl
       ? Promise.resolve(trackInfo.coverUrl)
       : ipics(`${trackInfo.artist} - ${trackInfo.title}`, 'album')
-          .then((res) => _.get(_.head(res), 'imageUrl'))
+          .then(
+            (res: ?Array<?Object>): ?string => _.get('imageUrl')(_.head(res)),
+          )
   ))
-  .then((coverUrl: ?string) => (
+  .then((coverUrl: ?string): Promise<?Buffer> => (
     coverUrl
       ? request(coverUrl, { encoding: null })
       : Promise.resolve()
@@ -76,29 +78,19 @@ export default (
       .setFrame('TPE1', [trackInfo.artist]) // Set artist tag
       .setFrame('TIT2', trackInfo.title) // Set title tag
       // Set album title tag
-      .setFrame('TALB', _.get(
-        trackInfo,
-        'album.title',
+      .setFrame('TALB', _.getOr(
         /\((original|extended|radio).*\)/i.test(trackInfo.title)
-          ? _.nth(trackInfo.title.match(/([^\(]*)/), 1) || ''
-          : trackInfo.title
-      ))
+          ? _.nth(1)(trackInfo.title.match(/([^\(]*)/)) || ''
+          : trackInfo.title,
+      )('album.title')(trackInfo))
       // Set album artist tag
-      .setFrame('TPE2', _.get(
-        trackInfo,
-        'album.artist',
-        ''
-      ))
+      .setFrame('TPE2', _.getOr('')('album.artist')(trackInfo))
       // Set track number tag
-      .setFrame('TRCK', _.get(trackInfo, 'album.trackNumber', '1/1'))
+      .setFrame('TRCK', _.getOr('1/1')('album.trackNumber')(trackInfo))
       // Set year tag
       .setFrame('TYER', _
-        .get(
-          trackInfo,
-          'album.releaseDate',
-          new Date()
-        )
-        .getFullYear()
+        .getOr(new Date())('album.releaseDate')(trackInfo)
+        .getFullYear(),
       );
 
     if (coverBuffer) {
@@ -113,6 +105,8 @@ export default (
 
     gauge.hide();
     console.log(chalk.green('Downloaded the track successfully'));
+
+    return;
   })
   .catch((err: Error): Promise<any> => {
     gauge.hide();

@@ -2,7 +2,7 @@
  * @flow
  */
 
-import _ from 'lodash';
+import _ from 'lodash/fp';
 import similarity from 'similarity';
 import requestPromise from 'request-promise';
 
@@ -26,99 +26,102 @@ export type Match = TrackQuery & {
 
 const request = requestPromise.defaults({
   headers: {
-    'User-Agent': `${pkg.name}v${pkg.version}`
-  }
+    'User-Agent': `${pkg.name}v${pkg.version}`,
+  },
 });
 
 export default (query: TrackQuery): Promise<Array<Match>> => {
-  const getMatchesFromSoundcloud = () => request
+  const getMatchesFromSoundcloud = (): Promise<Array<Object>> => request
     .get({
       uri: 'http://api.soundcloud.com/tracks',
       qs: {
         client_id: '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea',
-        q: `${query.artist} - ${query.title}`
+        q: `${query.artist} - ${query.title}`,
       },
-      json: true
+      json: true,
     })
-    .then((json) => _.map(json, (result) => ({
-      artist: _.get(result, 'user.username'),
-      title: result.title,
-      duration: _.divide(result.duration, 1000),
-      coverUrl: _.replace(result.artwork_url, 'large', 't500x500'),
-      album: {
-        releaseDate: new Date(result.created_at)
-      },
-      source: 'Soundcloud',
-      ...parseQuery(result.title)
-    })));
+    .then(_.map(
+      (result: Object): Object => ({
+        artist: _.get('user.username')(result),
+        title: result.title,
+        duration: _.divide(_, 1000)(result.duration),
+        coverUrl: _.replace('large', 't500x500')(result.artwork_url),
+        album: {
+          releaseDate: new Date(result.created_at),
+        },
+        source: 'Soundcloud',
+        ...parseQuery(result.title),
+      }),
+    ));
 
-  const formatArtistFromMusibrainzResponse = (res) => _
+  const formatArtistFromMusibrainzResponse = (res: Object): string => _
     .map(
-      res['artist-credit'],
-      ({ joinphrase = '', artist }) => `${artist.name}${joinphrase}`
-    )
+      ({ joinphrase = '', artist }: {
+        joinphrase: string,
+        artist: Object,
+      }): string => `${artist.name}${joinphrase}`,
+    )(res['artist-credit'])
     .join('');
-  const getMatchesFromMusicbrainz = () => request
+  const getMatchesFromMusicbrainz = (): Promise<Array<Object>> => request
     .get({
       uri: 'http://musicbrainz.org/ws/2/recording',
       qs: {
         query: [
           query.title,
           `artist:"${query.primaryArtist}"`,
-          'status:"Official"'
+          'status:"Official"',
         ].join(' AND '),
         limit: 10,
-        fmt: 'json'
+        fmt: 'json',
       },
-      json: true
+      json: true,
     })
-    .then((json) => _.map(json.recordings, (result) => ({
-      ...parseQuery(
-        formatArtistFromMusibrainzResponse(result),
-        result.title
-      ),
-      duration: _.divide(result.length, 1000),
-      source: 'Musicbrainz',
-      album: _
-        .chain(result.releases)
-        .map(
-          (release) => ({
-            ..._.pick(release, ['id', 'title']),
-            artist: formatArtistFromMusibrainzResponse(release) ||
-              formatArtistFromMusibrainzResponse(result)
-                .replace(featuringArtistRegex, '')
-                .trim(),
-            releaseDate: new Date(release.date),
-            trackNumber: _.thru(
-              _.get(release, 'media[0]', {}),
-              (media) => [
-                (parseInt(media['track-offset'], 10) || 0) + 1,
-                media['track-count'] || 1
-              ].join('/')
-            )
-          })
-        )
-        .head()
-        .value()
-    })));
+    .then(_.get('recordings'))
+    .then(_.map(
+      (result: Object): Object => ({
+        ...parseQuery(
+          formatArtistFromMusibrainzResponse(result),
+          result.title,
+        ),
+        duration: _.divide(_, 1000)(result.length),
+        source: 'Musicbrainz',
+        album: _.flow(
+          _.map(
+            (release: Object): Object => ({
+              ..._.pick(['id', 'title'])(release),
+              artist: formatArtistFromMusibrainzResponse(release) ||
+                formatArtistFromMusibrainzResponse(result)
+                  .replace(featuringArtistRegex, '')
+                  .trim(),
+              releaseDate: new Date(release.date),
+              trackNumber: _.thru(
+                (media: Object): string => _.join('/')([
+                  (parseInt(media['track-offset'], 10) || 0) + 1,
+                  media['track-count'] || 1,
+                ]),
+              )(_.getOr({})('media[0]')(release)),
+            }),
+          ),
+          _.head,
+        )(result.releases),
+      }),
+    ));
 
   return Promise
     .all([
       getMatchesFromSoundcloud(),
-      getMatchesFromMusicbrainz()
+      getMatchesFromMusicbrainz(),
     ])
-    .then((matches) => Promise.resolve(_
-      .chain(matches)
-      .flattenDeep()
-      .map((match) => ({
+    .then(_.flow(
+      _.flattenDeep,
+      _.map((match: Object): Match => ({
         ...match,
         score: (
           similarity(match.title, query.title) +
             similarity(match.artist, query.artist)
-        ) / 2
-      }))
-      .sortBy('score', (match) => !!match.coverUrl)
-      .reverse()
-      .value()
+        ) / 2,
+      })),
+      _.sortBy(['score', (match: Match): bool => !!match.coverUrl]),
+      _.reverse,
     ));
 };

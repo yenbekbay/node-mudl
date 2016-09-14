@@ -2,7 +2,7 @@
  * @flow
  */
 
-import _ from 'lodash';
+import _ from 'lodash/fp';
 import request from 'request-promise';
 import similarity from 'similarity';
 
@@ -10,16 +10,15 @@ import parseQuery from './parseQuery';
 import type { Match } from './getMatches';
 import type { TrackQuery } from './parseQuery';
 
-const calculateBitrate = (size: number, duration: number) => _
-  .chain(size)
-  .multiply(8)
-  .divide(1024)
-  .divide(duration)
-  .divide(64)
-  .round()
-  .multiply(64)
-  .thru((bitrate) => _.min([bitrate, 320]))
-  .value();
+const calculateBitrate = (size: number, duration: number): number => _.flow(
+  _.multiply(8),
+  _.divide(_, 1024),
+  _.divide(_, duration),
+  _.divide(_, 64),
+  _.round,
+  _.multiply(64),
+  _.thru((bitrate: number): number => _.min([bitrate, 320])),
+)(size);
 
 export type Result = TrackQuery & {
   duration: number,
@@ -31,50 +30,52 @@ export type Result = TrackQuery & {
 export default (
   { accessToken, userId }: { accessToken: string, userId: string },
   query: TrackQuery,
-  match: ?Match
+  match: ?Match,
 ): Promise<Array<Result>> => request
   .get({
     uri: 'https://api.vk.com/method/audio.search',
     qs: {
       access_token: accessToken,
       uids: userId,
-      q: `${query.artist} - ${query.title}`
+      q: `${query.artist} - ${query.title}`,
     },
-    json: true
+    json: true,
   })
-  .then((json) => Promise.all(_
-    .chain(json)
-    .get('response', [])
-    .drop()
-    .map((result) => ({
-      ..._.pick(result, ['duration', 'url']),
-      ...parseQuery(result.artist, result.title)
-    }))
-    .map((result) => ({
-      ...result,
-      score: _.mean([
-        similarity(result.title, _.get(match, 'title', query.title)),
-        similarity(result.artist, _.get(match, 'artist', query.artist)),
-        match
-          ? 1 - _.min([1, Math.abs(match.duration - result.duration) / 20])
-          : 1
-      ])
-    }))
-    .sortBy('score')
-    .reverse()
-    .slice(0, 10)
-    .map((result) => request
+  .then((json: Object): Promise<Array<Result>> => Promise.all(_.flow(
+    _.getOr([])('response'),
+    _.drop(1),
+    _.map(
+      _.flow(
+        (result: Object): Object => ({
+          ..._.pick(['duration', 'url'])(result),
+          ...parseQuery(result.artist, result.title),
+        }),
+        (result: Object): Object => ({
+          ...result,
+          score: _.mean([
+            similarity(result.title, _.getOr(query.title)('title')(match)),
+            similarity(result.artist, _.getOr(query.artist)('artist')(match)),
+            match
+              ? 1 - _.min([1, Math.abs(match.duration - result.duration) / 20])
+              : 1,
+          ]),
+        }),
+      ),
+    ),
+    _.sortBy('score'),
+    _.reverse,
+    _.slice(0, 10),
+    _.map((result: Object): Promise<Result> => request
       .head({
         uri: result.url,
-        resolveWithFullResponse: true
+        resolveWithFullResponse: true,
       })
-      .then(({ headers }) => Promise.resolve({
+      .then(({ headers }: { headers: Object }): Result => ({
         ...result,
         bitrate: calculateBitrate(
           parseInt(headers['content-length'], 10),
-          result.duration
-        )
-      }))
-    )
-    .value()
-  ));
+          result.duration,
+        ),
+      })),
+    ),
+  )(json)));

@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 
-import _ from 'lodash';
+import _ from 'lodash/fp';
 import chalk from 'chalk';
 import Configstore from 'configstore';
 import inquirer from 'inquirer';
@@ -35,7 +35,7 @@ const { argv } = yargs
     alias: 'dir',
     describe: 'Directory to save the downloaded mp3 file to',
     type: 'string',
-    coerce: (dir) => dir.replace(/\\/gi, '')
+    coerce: (dir: string): string => dir.replace(/\\/gi, ''),
   })
   .help('h', 'Display help message')
   .alias('h', 'help')
@@ -43,7 +43,7 @@ const { argv } = yargs
   .alias('v', 'version')
   .example(
     'mudl "Daft Punk - Get Lucky"',
-    'Download the track "Get Lucky" by Daft Punk in the current directory'
+    'Download the track "Get Lucky" by Daft Punk in the current directory',
   )
   .check(({ dir }) => {
     if (!dir || (pathExists.sync(dir) && fs.lstatSync(dir).isDirectory())) {
@@ -82,14 +82,14 @@ if (!query) {
               name: 'match',
               message: 'Please select the best match',
               choices: [
-                ...matches.map((match) => ({
+                ..._.map((match: Match) => ({
                   name: `${match.artist} - ${match.title} ` +
                     `(${match.source}, ${formatDuration(match.duration)})`,
-                  value: match
-                })),
-                { name: '→ Skip', value: null }
+                  value: match,
+                }))(matches),
+                { name: '→ Skip', value: null },
               ],
-              type: 'list'
+              type: 'list',
             }])
             .then(({ match }) => match);
         })
@@ -99,7 +99,7 @@ if (!query) {
 
             console.log(chalk.green(
               `Found a match from ${source}: ${artist} - ${title} ` +
-              `(${formatDuration(duration)})`
+              `(${formatDuration(duration)})`,
             ));
           } else {
             console.log(chalk.yellow('No match found'));
@@ -114,10 +114,11 @@ if (!query) {
 
               if (!results.length) return Promise.resolve();
 
-              const bestResult = _(results)
-                .sortBy('bitrate', 'score')
-                .reverse()
-                .head();
+              const bestResult = _.flow(
+                _.sortBy(['bitrate', 'score']),
+                _.reverse,
+                _.head,
+              )(results);
 
               if (bestResult.bitrate === 320) {
                 return Promise.resolve(bestResult);
@@ -127,12 +128,12 @@ if (!query) {
                 .prompt([{
                   name: 'result',
                   message: 'Please select the best result',
-                  choices: results.map((result) => ({
+                  choices: _.map((result: Result) => ({
                     name: `${result.artist} - ${result.title} ` +
                       `(${metaForResult(result)})`,
-                    value: result
-                  })),
-                  type: 'list'
+                    value: result,
+                  }))(results),
+                  type: 'list',
                 }])
                 .then(({ result }) => Promise.resolve(result));
             })
@@ -147,13 +148,18 @@ if (!query) {
               return result
                 ? downloadTrack(result, match || result, argv.dir)
                 : Promise.reject(new Error(
-                    `Could not find anything for "${argv._[0]}"`
+                    `Could not find anything for "${argv._[0]}"`,
                   ));
+            })
+            .catch((err: Error) => {
+              spinner.stop();
+
+              return Promise.reject(err);
             });
         });
     })
     .catch((err: Error) => {
-      console.error(chalk.red(err.message));
+      console.error(err);
       process.exit(1);
     });
 }
