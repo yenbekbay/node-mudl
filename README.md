@@ -1,9 +1,14 @@
 # mudl
-**A cli tool for downloading music from VK in high quality**
 
-[![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Dependency Status][daviddm-image]][daviddm-url]
+[![Version](https://img.shields.io/npm/v/mudl.svg)](http://npm.im/mudl)
+[![Dependency Status](https://img.shields.io/david/yenbekbay/node-mudl.svg)](https://david-dm.org/yenbekbay/node-mudl)
+[![devDependency Status](https://img.shields.io/david/dev/yenbekbay/node-mudl.svg)](https://david-dm.org/yenbekbay/node-mudl?type=dev)
+[![Standard Version](https://img.shields.io/badge/release-standard%20version-brightgreen.svg)](https://github.com/conventional-changelog/standard-version)
+[![Commitizen Friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli)
 
-[![NodeICO][nodeico-image]][nodeico-url]
+[![NodeICO](https://nodei.co/npm/mudl.png?downloads=true&downloadRank=true)](https://nodei.co/npm/mudl)
+
+A cli tool for downloading music from VK in high quality
 
 <a href="https://asciinema.org/a/dmb24dlyddfdgrhkac6vbxxet" target="_blank"><img width="500" src="https://asciinema.org/a/dmb24dlyddfdgrhkac6vbxxet.png" /></a>
 
@@ -28,34 +33,6 @@ Examples:
                                 the current directory
 ```
 
-## The MIT License
+## License
 
-Copyright (C) 2016  Ayan Yenbekbay
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-[downloads-image]: https://img.shields.io/npm/dm/mudl.svg
-[npm-url]: https://www.npmjs.com/package/mudl
-[npm-image]: https://img.shields.io/npm/v/mudl.svg
-
-[daviddm-image]: https://david-dm.org/yenbekbay/node-mudl.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/yenbekbay/node-mudl
-
-[nodeico-url]: https://nodei.co/npm/mudl
-[nodeico-image]: https://nodei.co/npm/mudl.png?downloads=true&downloadRank=true
+[MIT License](./LICENSE) © Ayan Yenbekbay
