@@ -19,7 +19,7 @@ import downloadTrack from './downloadTrack';
 import getMatches from './getMatches';
 import getResultsFromVk from './getResultsFromVk';
 import parseQuery from './parseQuery';
-import pkg from '../package';
+import pkg from '../package.json';
 import type { Match } from './getMatches';
 import type { Result } from './getResultsFromVk';
 
@@ -67,7 +67,7 @@ if (!query) {
         .then((matches: Array<Match>) => {
           spinner.stop();
 
-          if (!matches.length) return Promise.resolve();
+          if (matches.length === 0) return Promise.resolve();
 
           const bestMatch = _.head(matches);
 
@@ -80,11 +80,14 @@ if (!query) {
               name: 'match',
               message: 'Please select the best match',
               choices: [
-                ..._.map((match: Match) => ({
-                  name: `${match.artist} - ${match.title} ` +
-                    `(${match.source}, ${formatDuration(match.duration)})`,
-                  value: match,
-                }))(matches),
+                ..._.map(
+                  (match: Match) => ({
+                    name: `${match.artist} - ${match.title} ` +
+                      `(${match.source}, ${formatDuration(match.duration)})`,
+                    value: match,
+                  }),
+                  matches,
+                ),
                 { name: '→ Skip', value: null },
               ],
               type: 'list',
@@ -103,6 +106,7 @@ if (!query) {
             console.log(chalk.yellow('No match found'));
           }
 
+          // eslint-disable-next-line fp/no-mutation
           spinner.text = 'Gettings results from VK...';
           spinner.start();
 
@@ -110,7 +114,7 @@ if (!query) {
             .then((results: Array<Result>): Promise<?Result> => {
               spinner.stop();
 
-              if (!results.length) return Promise.resolve();
+              if (results.length === 0) return Promise.resolve();
 
               const bestResult = _.flow(
                 _.sortBy(['bitrate', 'score']),
@@ -126,28 +130,35 @@ if (!query) {
                 .prompt([{
                   name: 'result',
                   message: 'Please select the best result',
-                  choices: _.map((result: Result) => ({
-                    name: `${result.artist} - ${result.title} ` +
-                      `(${metaForResult(result)})`,
-                    value: result,
-                  }))(results),
+                  choices: _.map(
+                    (result: Result) => ({
+                      name: `${result.artist} - ${result.title} ` +
+                        `(${metaForResult(result)})`,
+                      value: result,
+                    }),
+                    results,
+                  ),
                   type: 'list',
                 }])
                 .then(({ result }) => Promise.resolve(result));
             })
-            .then((result: ?Result) => {
-              const trackInfo = match || result;
-
-              if (trackInfo && !trackInfo.version && query.version) {
-                trackInfo.version = query.version;
-                trackInfo.title = query.title;
+            .then((result: ?Result): Promise<void> => {
+              if (!result) {
+                return Promise.reject(new Error(
+                  `Could not find anything for "${argv._[0]}"`,
+                ));
               }
 
-              return result
-                ? downloadTrack(result, match || result, argv.dir)
-                : Promise.reject(new Error(
-                    `Could not find anything for "${argv._[0]}"`,
-                  ));
+              const trackInfo: Object = _.thru(
+                (info: Object) => (
+                  !info.version && query.version
+                    ? { ...info, ..._.pick(['version', 'title'], query) }
+                    : info
+                ),
+                match || result,
+              );
+
+              return downloadTrack(result, trackInfo, argv.dir);
             })
             .catch((err: Error) => {
               spinner.stop();

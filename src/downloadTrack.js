@@ -15,7 +15,7 @@ import request from 'request-promise';
 import { formatDuration, formatSize, metaForResult } from './helpers';
 import type { Result } from './getResultsFromVk';
 
-export default (
+const downloadTrack = (
   result: Result,
   trackInfo: Object,
   dir: ?string,
@@ -39,9 +39,9 @@ export default (
           percentage: number,
           size: {
             total: number,
-            transferred: number
+            transferred: number,
           },
-          time: { remaining: number }
+          time: { remaining: number },
         },
       ) => {
         gauge.show(
@@ -59,7 +59,7 @@ export default (
       ? Promise.resolve(trackInfo.coverUrl)
       : ipics(`${trackInfo.artist} - ${trackInfo.title}`, 'album')
           .then(
-            (res: ?Array<?Object>): ?string => _.get('imageUrl')(_.head(res)),
+            (res: ?Array<?Object>): ?string => _.get('imageUrl', _.head(res)),
           )
   ))
   .then((coverUrl: ?string): Promise<?Buffer> => (
@@ -80,14 +80,16 @@ export default (
         /\((original|extended|radio).*\)/i.test(trackInfo.title)
           ? _.nth(1)(trackInfo.title.match(/([^\(]*)/)) || ''
           : trackInfo.title,
-      )('album.title')(trackInfo))
+        'album.title',
+        trackInfo,
+      ))
       // Set album artist tag
-      .setFrame('TPE2', _.getOr('')('album.artist')(trackInfo))
+      .setFrame('TPE2', _.getOr('', 'album.artist', trackInfo))
       // Set track number tag
-      .setFrame('TRCK', _.getOr('1/1')('album.trackNumber')(trackInfo))
+      .setFrame('TRCK', _.getOr('1/1', 'album.trackNumber', trackInfo))
       // Set year tag
       .setFrame('TYER', _
-        .getOr(new Date())('album.releaseDate')(trackInfo)
+        .getOr(new Date(), 'album.releaseDate', trackInfo)
         .getFullYear(),
       );
 
@@ -106,9 +108,11 @@ export default (
 
     return;
   })
-  .catch((err: Error): Promise<any> => {
+  .catch((err: Error) => {
     gauge.hide();
 
     return Promise.reject(err);
   });
 };
+
+export default downloadTrack;

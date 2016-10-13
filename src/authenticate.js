@@ -8,7 +8,7 @@ import inquirer from 'inquirer';
 import vkAuth from './vkAuth';
 import type { AuthResponse } from './vkAuth';
 
-export default (config: Configstore): Promise<AuthResponse> => {
+const authenticate = (config: Configstore): Promise<AuthResponse> => {
   const cachedAccessToken = config.get('accessToken');
   const cachedUserId = config.get('userId');
 
@@ -28,7 +28,7 @@ export default (config: Configstore): Promise<AuthResponse> => {
       {
         name: 'email',
         message: 'Please enter your VK email',
-        validate: (email: string): bool | string =>
+        validate: (email: string) =>
           emailRegex().test(email) || 'Please provide a valid email',
       },
       {
@@ -37,9 +37,9 @@ export default (config: Configstore): Promise<AuthResponse> => {
         message: 'Please enter your VK password',
         validate: (
           password: string, { email }: { email: string },
-        ): Promise<bool | string> =>
+        ): Promise<boolean | string> =>
           vkAuth(email, password)
-            .then(({ accessToken, userId }: AuthResponse): bool => {
+            .then(({ accessToken, userId }: AuthResponse) => {
               config.set('accessToken', accessToken);
               config.set('userId', userId);
 
@@ -53,3 +53,5 @@ export default (config: Configstore): Promise<AuthResponse> => {
       userId: config.get('userId'),
     }));
 };
+
+export default authenticate;

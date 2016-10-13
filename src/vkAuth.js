@@ -2,7 +2,7 @@
 
 import _ from 'lodash/fp';
 import cheerio from 'cheerio';
-import requestPromise from 'request-promise';
+import rp from 'request-promise';
 
 const vkClientId = 3607693;
 const vkClientSecret = '3bpFB2SKpfQxShx6gI2r';
@@ -10,15 +10,15 @@ const vkRedirectUri = 'https://oauth.vk.com/blank.html';
 
 export type AuthResponse = {
   accessToken: string,
-  userId: string
+  userId: string,
 };
 
-const request = requestPromise.defaults({
+const request = rp.defaults({
   jar: true,
   resolveWithFullResponse: true,
 });
 
-export default (email: string, pass: string): Promise<AuthResponse> => request
+const vkAuth = (email: string, pass: string): Promise<AuthResponse> => request
   .get({
     uri: 'https://oauth.vk.com/authorize',
     qs: {
@@ -38,7 +38,7 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
       _.map(({ name, value }: {
         name: string,
         value: mixed,
-      }): Object => ({ [name]: value })),
+      }) => ({ [name]: value })),
       _.assign,
     )(form.serializeArray());
 
@@ -56,7 +56,7 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
     });
   })
   .then(({ request: { uri } }: { request: Object }): Promise<Object> => {
-    const code = _.nth(1)(_.getOr('')('hash')(uri).match(/code=(.*)/));
+    const code = _.nth(1, _.getOr('', 'hash', uri).match(/code=(.*)/));
 
     if (!code) {
       return Promise.reject('VK authorization failed');
@@ -83,3 +83,5 @@ export default (email: string, pass: string): Promise<AuthResponse> => request
       userId: body.user_id,
     });
   });
+
+export default vkAuth;

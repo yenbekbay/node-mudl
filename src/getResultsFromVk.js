@@ -4,28 +4,19 @@ import _ from 'lodash/fp';
 import request from 'request-promise';
 import similarity from 'similarity';
 
+import { calculateBitrate } from './helpers';
 import parseQuery from './parseQuery';
 import type { Match } from './getMatches';
 import type { TrackQuery } from './parseQuery';
-
-const calculateBitrate = (size: number, duration: number): number => _.flow(
-  _.multiply(8),
-  _.divide(_, 1024),
-  _.divide(_, duration),
-  _.divide(_, 64),
-  _.round,
-  _.multiply(64),
-  _.thru((bitrate: number): number => _.min([bitrate, 320])),
-)(size);
 
 export type Result = TrackQuery & {
   duration: number,
   url: string,
   score: number,
-  bitrate: number
+  bitrate: number,
 };
 
-export default (
+const getResultsFromVk = (
   { accessToken, userId }: { accessToken: string, userId: string },
   query: TrackQuery,
   match: ?Match,
@@ -39,20 +30,20 @@ export default (
     },
     json: true,
   })
-  .then((json: Object): Promise<Array<Result>> => Promise.all(_.flow(
-    _.getOr([])('response'),
+  .then(_.flow(
+    _.getOr([], 'response'),
     _.drop(1),
     _.map(
       _.flow(
-        (result: Object): Object => ({
+        (result: Object) => ({
           ..._.pick(['duration', 'url'])(result),
-          ...parseQuery(result.artist, result.title),
+          ...parseQuery(`${result.artist} - ${result.title}`),
         }),
-        (result: Object): Object => ({
+        (result: Object) => ({
           ...result,
           score: _.mean([
-            similarity(result.title, _.getOr(query.title)('title')(match)),
-            similarity(result.artist, _.getOr(query.artist)('artist')(match)),
+            similarity(result.title, _.getOr(query.title, 'title', match)),
+            similarity(result.artist, _.getOr(query.artist, 'artist', match)),
             match
               ? 1 - _.min([1, Math.abs(match.duration - result.duration) / 20])
               : 1,
@@ -76,4 +67,7 @@ export default (
         ),
       })),
     ),
-  )(json)));
+    (promises: Array<Promise<Result>>) => Promise.all(promises),
+  ));
+
+export default getResultsFromVk;

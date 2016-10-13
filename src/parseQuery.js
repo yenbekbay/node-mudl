@@ -3,69 +3,79 @@
 import _ from 'lodash/fp';
 import he from 'he';
 
-export const featuringArtistRegex = /\(?feat\. ([^()]*)\)?/;
-
 export type TrackQuery = {
   primaryArtist: string,
   artist: string,
   title: string,
-  version: ?string
+  version: ?string,
 };
 
-export default (...args: Array<string>): ?TrackQuery => {
-  let components = _.flow(
-    _.replace(/\s+(‒|–|—)\s+/g, ' - '),
-    _.split(' - '),
-    _.map(_.trim),
-  )(he.decode(args.join(' - ')));
+const featuringArtistRegex = /\(?feat\. ([^()]*)\)?/;
+
+const getComponents: ((input: string) => Array<string>) = _.flow(
+  he.decode,
+  _.replace(/\s+(‒|–|—)\s+/g, ' - '),
+  _.split(/ - (.+)/),
+  _.dropRight(1),
+  _.thru((comps: Array<string>) => (
+    !/[^\x00-\x7F]+/.test(_.join(' - ', comps))
+      ? _.map(_.replace(/\b\w/g, _.toUpper), comps)
+      : comps
+  )),
+  _.map(_.flow(
+    _.trim,
+    _.replace(/\//g, ' & '),
+    _.replace(/(\s+|\()f((eat|t)\.?|eaturing)\s+/ig, '$1feat. '),
+    _.replace(/\s+v(s\.?|ersus)\s+/ig, ' vs. '),
+    _.replace(/\s+dj\s+/ig, ' DJ '),
+    _.replace(/\[/g, '('),
+    _.replace(/\]/g, ')'),
+    _.replace(/\(/g, ' ('),
+  )),
+);
+
+const parseQuery = (query: string): ?TrackQuery => {
+  const components = getComponents(query);
 
   if (components.length < 2) return null;
 
-  components = [components[0], _.drop(1)(components).join(' - ')];
+  const getComponent: ((idx: number) => string) = _.flow(
+    _.nth(_, components),
+    _.replace(featuringArtistRegex, ''),
+    _.replace(/\s+/g, ' '),
+    _.trim,
+  );
 
-  // Capitalize each word in title if query doesn't contain any foreign chars
-  if (!/[^\x00-\x7F]+/.test(components.join(' - '))) {
-    components = [
-      components[0],
-      components[1].replace(/\b\w/g, _.toUpper),
-    ];
-  }
-
-  components = _.map((comp: string): string => comp
-    .replace(/\//g, ' & ')
-    .replace(/(\s+|\()f((eat|t)\.?|eaturing)\s+/ig, '$1feat. ')
-    .replace(/\s+v(s\.?|ersus)\s+/ig, ' vs. ')
-    .replace(/\s+dj\s+/ig, ' DJ ')
-    .replace(/\[/g, '(')
-    .replace(/\]/g, ')')
-    .replace(/\(/g, ' ('),
-  )(components);
-
-  const getComponent = (idx: number): string => components[idx]
-    .replace(featuringArtistRegex, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const featuringArtists = _.flow(
-    _.map((comp: string): string => _.flow(
+  const featuringArtists: Array<string> = _.flow(
+    _.map(_.flow(
+      _.thru((comp: string) => comp.match(featuringArtistRegex)),
       _.nth(1),
       _.trim,
-    )(comp.match(featuringArtistRegex))),
+    )),
     _.compact,
   )(components);
+
   const primaryArtist = getComponent(0);
-  const artist = primaryArtist + (
-    featuringArtists && featuringArtists.length
-      ? ` feat. ${featuringArtists.join(' & ')}`.replace(/[Aa]nd/g, '&')
-      : ''
-  );
-  const title = getComponent(1)
-    .replace(
+  const artist = _.flow(
+    _.castArray,
+    _.concat(_, featuringArtists.length > 0
+      ? `feat. ${_.join(' & ', featuringArtists)}`.replace(/[Aa]nd/g, '&')
+      : '',
+    ),
+    _.join(' '),
+    _.trim,
+  )(primaryArtist);
+  const title = _.flow(
+    _.replace(
       /\([^\(]*(download|preview|out now|premiere|recordings)[^\)]*\)/ig,
       '',
-    )
-    .trim();
-  const version = _.nth(1)(title.match(/((?:\([^\(]*\)\s?)+$)/));
+    ),
+    _.trim,
+  )(getComponent(1));
+  const version = _.nth(1, title.match(/((?:\([^\(]*\)\s?)+$)/));
 
   return { primaryArtist, artist, title, version };
 };
+
+export { featuringArtistRegex };
+export default parseQuery;
