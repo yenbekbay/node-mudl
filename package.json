@@ -55,6 +55,18 @@
     "yargs": "^5.0.0"
   },
   "devDependencies": {
+    "@types/chalk": "^0.4.30",
+    "@types/cheerio": "^0.17.31",
+    "@types/configstore": "^0.3.30",
+    "@types/he": "^0.5.29",
+    "@types/inquirer": "^0.0.29",
+    "@types/lodash": "^4.14.37",
+    "@types/ora": "^0.0.29",
+    "@types/path-exists": "^1.0.29",
+    "@types/request": "^0.0.31",
+    "@types/request-promise": "^3.0.32",
+    "@types/update-notifier": "^0.0.28",
+    "@types/yargs": "^0.0.33",
     "babel-cli": "^6.11.4",
     "babel-plugin-lodash": "^3.2.8",
     "babel-plugin-transform-flow-strip-types": "^6.14.0",
