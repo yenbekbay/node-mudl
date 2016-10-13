@@ -1,7 +1,11 @@
 {
+  "files.associations": {
+    ".flowconfig": "ini",
+    "yarn.lock": "yaml"
+  },
   "files.trimTrailingWhitespace": true,
 
-  "editor.renderWhitespace": true,
+  "editor.renderWhitespace": "boundary",
   "editor.rulers": [80],
   "editor.tabSize": 2,
 
