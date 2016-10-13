@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6"
+    "target": "ES6",
+    "allowSyntheticDefaultImports": true
   },
-  "exclude": [
-    "node_modules"
+  "files": [
+    "src/**/*"
   ]
 }
