@@ -1,8 +1,6 @@
 #! /usr/bin/env node
 
-/**
- * @flow
- */
+/* @flow */
 
 import fs from 'fs';
 

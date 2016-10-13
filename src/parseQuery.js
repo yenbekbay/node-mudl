@@ -1,6 +1,4 @@
-/**
- * @flow
- */
+/* @flow */
 
 import _ from 'lodash/fp';
 import he from 'he';
