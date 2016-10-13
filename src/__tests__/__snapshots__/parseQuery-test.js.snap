@@ -1,0 +1,188 @@
+exports[`parseQuery processes a query 1`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 2`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
+
+exports[`parseQuery processes a query 3`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 4`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 5`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 6`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 7`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 8`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 9`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 10`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 11`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 12`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 13`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 14`] = `
+Object {
+  "artist": "Some Artist feat. Another Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track",
+  "version": undefined,
+}
+`;
+
+exports[`parseQuery processes a query 15`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Track (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
+
+exports[`parseQuery processes a query 16`] = `
+Object {
+  "artist": "Какой-то артист",
+  "primaryArtist": "Какой-то артист",
+  "title": "Какой-то трек (Какой-то ремикс)",
+  "version": "(Какой-то ремикс)",
+}
+`;
+
+exports[`parseQuery processes a query 17`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Title (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
+
+exports[`parseQuery processes a query 18`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Title (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
+
+exports[`parseQuery processes a query 19`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Title (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
+
+exports[`parseQuery processes a query 20`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Title (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
+
+exports[`parseQuery processes a query 21`] = `
+Object {
+  "artist": "Some Artist",
+  "primaryArtist": "Some Artist",
+  "title": "Some Title (Some Remix)",
+  "version": "(Some Remix)",
+}
+`;
