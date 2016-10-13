@@ -1,5 +1,8 @@
 {
-  "extends": "anvilabs",
+  "extends": [
+    "anvilabs",
+    "anvilabs/jest"
+  ],
   "rules": {
     "no-console": 0,
 

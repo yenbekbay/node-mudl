@@ -34,14 +34,24 @@
   ],
   "scripts": {
     "commit": "git-cz",
-    "build": "babel ./src -d ./lib",
+    "build": "npm run clean && babel --out-dir ./lib --ignore **/__tests__,**/__mocks__ ./src",
+    "clean": "rimraf build && mkdir build",
     "prepublish": "npm run build",
-    "test": "npm run lint",
+    "test": "npm-run-all --parallel typecheck lint jest",
+    "jest": "jest",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
+    "typecheck": "flow check ./src",
     "commitmsg": "validate-commit-msg",
     "prepush": "npm test",
     "release": "standard-version"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
+    "testRegex": "/__tests__/.*-test\\.js$"
   },
   "config": {
     "commitizen": {
@@ -77,6 +87,7 @@
     "@types/configstore": "^0.3.30",
     "@types/he": "^0.5.29",
     "@types/inquirer": "^0.0.29",
+    "@types/jest": "^15.1.32",
     "@types/lodash": "^4.14.37",
     "@types/ora": "^0.0.29",
     "@types/path-exists": "^1.0.29",
@@ -85,6 +96,7 @@
     "@types/update-notifier": "^0.0.28",
     "@types/yargs": "^0.0.33",
     "babel-cli": "^6.11.4",
+    "babel-jest": "^16.0.0",
     "babel-plugin-lodash": "^3.2.8",
     "babel-plugin-transform-flow-strip-types": "^6.14.0",
     "babel-plugin-transform-runtime": "^6.15.0",
@@ -94,7 +106,11 @@
     "cz-conventional-changelog": "^1.2.0",
     "eslint": "^3.5.0",
     "eslint-config-anvilabs": "^1.3.0",
+    "flow-bin": "^0.33.0",
     "husky": "^0.11.9",
+    "jest": "^16.0.1",
+    "npm-run-all": "^3.1.0",
+    "rimraf": "^2.5.4",
     "standard-version": "^3.0.0",
     "validate-commit-msg": "^2.8.2"
   }
