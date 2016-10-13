@@ -168,7 +168,18 @@ if (!query) {
         });
     })
     .catch((err: Error) => {
-      console.error(err);
+      const isFriendlyError = new RegExp(_.join('|', [
+        'could not find anything',
+        'already exists',
+        'authorization failed',
+      ]), 'i').test(err.message);
+
+      if (isFriendlyError) {
+        console.error(chalk.red(err.message));
+      } else {
+        console.error(err);
+      }
+
       process.exit(1);
     });
 }

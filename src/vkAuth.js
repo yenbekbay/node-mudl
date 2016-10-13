@@ -43,7 +43,7 @@ const vkAuth = (email: string, pass: string): Promise<AuthResponse> => request
     )(form.serializeArray());
 
     if (!uri || !params) {
-      return Promise.reject('VK authorization failed');
+      return Promise.reject(new Error('VK authorization failed'));
     }
 
     return request.post({
@@ -59,7 +59,7 @@ const vkAuth = (email: string, pass: string): Promise<AuthResponse> => request
     const code = _.nth(1, _.getOr('', 'hash', uri).match(/code=(.*)/));
 
     if (!code) {
-      return Promise.reject('VK authorization failed');
+      return Promise.reject(new Error('VK authorization failed'));
     }
 
     return request.get({
@@ -75,7 +75,7 @@ const vkAuth = (email: string, pass: string): Promise<AuthResponse> => request
   })
   .then(({ body }: { body: Object }): Promise<AuthResponse> => {
     if (!body || !body.access_token || !body.user_id) {
-      return Promise.reject('VK authorization failed');
+      return Promise.reject(new Error('VK authorization failed'));
     }
 
     return Promise.resolve({
