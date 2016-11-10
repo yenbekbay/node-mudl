@@ -74,7 +74,7 @@
     "lodash": "^4.13.1",
     "ora": "^0.3.0",
     "path-exists": "^3.0.0",
-    "request": "^2.76.0",
+    "request": "^2.78.0",
     "request-progress": "^2.0.1",
     "request-promise": "^4.1.1",
     "similarity": "^1.1.0",
