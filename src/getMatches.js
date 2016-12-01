@@ -22,6 +22,8 @@ export type Match = TrackQuery & {
   },
 };
 
+const soundcloudApiKey = '2eaab453dce03a7bca4b475e4132a163';
+
 const request = requestPromise.defaults({
   headers: {
     'User-Agent': `${pkg.name}v${pkg.version}`,
@@ -33,7 +35,7 @@ const getMatches = (query: TrackQuery): Promise<Array<Match>> => {
     .get({
       uri: 'http://api.soundcloud.com/tracks',
       qs: {
-        client_id: '02gUJC0hH2ct1EGOcYXQIzRFU91c72Ea',
+        client_id: soundcloudApiKey,
         q: `${query.artist} - ${query.title}`,
       },
       json: true,
