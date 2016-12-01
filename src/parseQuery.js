@@ -29,7 +29,7 @@ const getComponents: ((input: string) => Array<string>) = _.flow(
     _.replace(/\s+v(s\.?|ersus)\s+/ig, ' vs. '),
     _.replace(/\s+dj\s+/ig, ' DJ '),
     _.replace(/\[/g, '('),
-    _.replace(/\]/g, ')'),
+    _.replace(/]/g, ')'),
     _.replace(/\(/g, ' ('),
   )),
 );
@@ -67,12 +67,12 @@ const parseQuery = (query: string): ?TrackQuery => {
   )(primaryArtist);
   const title = _.flow(
     _.replace(
-      /\([^\(]*(download|preview|out now|premiere|recordings)[^\)]*\)/ig,
+      /\([^(]*(download|preview|out now|premiere|recordings)[^)]*\)/ig,
       '',
     ),
     _.trim,
   )(getComponent(1));
-  const version = _.nth(1, title.match(/((?:\([^\(]*\)\s?)+$)/));
+  const version = _.nth(1, title.match(/((?:\([^(]*\)\s?)+$)/));
 
   return { primaryArtist, artist, title, version };
 };

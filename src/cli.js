@@ -106,7 +106,6 @@ if (!query) {
             console.log(chalk.yellow('No match found'));
           }
 
-          // eslint-disable-next-line fp/no-mutation
           spinner.text = 'Gettings results from VK...';
           spinner.start();
 

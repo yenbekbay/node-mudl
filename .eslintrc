@@ -1,11 +1,13 @@
 {
   "extends": [
     "anvilabs",
-    "anvilabs/jest"
+    "anvilabs/jest",
+    "anvilabs/lodash"
   ],
   "rules": {
     "no-console": 0,
 
-    "fp/no-unused-expression": 0
+    "promise/prefer-await-to-callbacks": 0,
+    "promise/prefer-await-to-then": 0
   }
 }

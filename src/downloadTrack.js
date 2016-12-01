@@ -78,7 +78,7 @@ const downloadTrack = (
       // Set album title tag
       .setFrame('TALB', _.getOr(
         /\((original|extended|radio).*\)/i.test(trackInfo.title)
-          ? _.nth(1)(trackInfo.title.match(/([^\(]*)/)) || ''
+          ? _.nth(1)(trackInfo.title.match(/([^(]*)/)) || ''
           : trackInfo.title,
         'album.title',
         trackInfo,
@@ -106,7 +106,7 @@ const downloadTrack = (
     gauge.hide();
     console.log(chalk.green('Downloaded the track successfully'));
 
-    return;
+    return; // eslint-disable-line no-useless-return
   })
   .catch((err: Error) => {
     gauge.hide();
