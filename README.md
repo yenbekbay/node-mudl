@@ -15,7 +15,7 @@ A cli tool for downloading music from VK in high quality
 ## Installation
 
 ``` bash
-  $ [sudo] npm install mudl -g
+$ yarn global add mudl # npm install mudl -g
 ```
 
 ## Usage
