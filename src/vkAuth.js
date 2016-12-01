@@ -39,7 +39,7 @@ const vkAuth = (email: string, pass: string): Promise<AuthResponse> => request
         name: string,
         value: mixed,
       }) => ({ [name]: value })),
-      _.assign,
+      _.assignAll,
     )(form.serializeArray());
 
     if (!uri || !params) {
