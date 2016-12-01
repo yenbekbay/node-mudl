@@ -1,5 +1,5 @@
-// flow-typed signature: 7b3bc6a5025d594dae4c16105008248d
-// flow-typed version: dd49a9fb04/jest_v16.x.x/flow_>=v0.33.x
+// flow-typed signature: 04965d796c54f045f5f5c8a2aa474600
+// flow-typed version: fc5874dbeb/jest_v16.x.x/flow_>=v0.33.x
 
 type JestMockFn = {
   (...args: Array<any>): any;
@@ -62,7 +62,7 @@ type JestExpectType = {
   toMatch(regexp: RegExp): void;
   toMatchSnapshot(): void;
   toThrow(message?: string | Error): void;
-  toThrowError(message?: string): void;
+  toThrowError(message?: string | Error | RegExp): void;
   toThrowErrorMatchingSnapshot(): void;
 }
 
