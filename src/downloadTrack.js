@@ -35,8 +35,8 @@ const downloadTrack = (
   return new Promise((resolve: () => void, reject: (err: Error) => void) => {
     progress(request(result.url), { throttle: 50 })
       .on('progress', (
-        { percentage, size, time }: {
-          percentage: number,
+        { percent, size, time }: {
+          percent: number,
           size: {
             total: number,
             transferred: number,
@@ -46,7 +46,7 @@ const downloadTrack = (
       ) => {
         gauge.show(
           `${formatSize(size.transferred)}/${formatSize(size.total)}`,
-          percentage,
+          percent,
         );
         gauge.pulse(`${formatDuration(time.remaining)} remaining`);
       })
